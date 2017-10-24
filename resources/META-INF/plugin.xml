@@ -1,8 +1,8 @@
 <idea-plugin>
-    <id>com.kaygisiz.dependencygraph</id>
-    <name>APK Dependency Graph</name>
-    <version>1.0</version>
-    <vendor email="ne.caner@hotmail.com">Void Ideas</vendor>
+    <id>com.kaygisiz.dependencinjectionygraph</id>
+    <name>Dependency Injection Graph</name>
+    <version>1.1</version>
+    <vendor email="voidideas@gmail.com">Void Ideas</vendor>
 
     <description><![CDATA[
       Displays injection dependencies of apk in browser.<br>
@@ -20,9 +20,7 @@
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
-    <depends>com.intellij.modules.lang</depends>
-    -->
+    <depends>com.intellij.modules.androidstudio</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
