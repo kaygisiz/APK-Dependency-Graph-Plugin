@@ -1,6 +1,8 @@
 package utils;
 
 public class Strings {
+    public final static String PROGRESSING_TEXT = "Generating Dependency Injection Graph";
+
     public final static String MESSAGE_ASK_GRAPH_LIBRARY_PATH = "Download URL: https://github.com/alexzaitsev/apk-dependency-graph/archive/master.zip";
     public final static String TITLE_ASK_GRAPH_LIBRARY_PATH = "Select Apk-Dependency-Graph Folder";
 
