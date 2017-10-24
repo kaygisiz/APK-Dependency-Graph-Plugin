@@ -9,8 +9,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import managers.FileChooserDialogManager;
 import managers.PropertiesManager;
 import org.jetbrains.annotations.NotNull;
+import utils.FileTypes;
 import utils.PropertyKeys;
 import org.apache.http.util.TextUtils;
 import utils.Strings;
@@ -58,11 +60,12 @@ public class DisplayGraphAction extends AnAction {
     }
 
     private void chooseAndSaveGraphDir(Project project) {
-        FileChooserDescriptor folderChooserDescriptor = new FileChooserDescriptor(false, true, false, false, false, false);
-        folderChooserDescriptor.setDescription(Strings.MESSAGE_ASK_GRAPH_LIBRARY_PATH);
-        folderChooserDescriptor.setTitle(Strings.TITLE_ASK_GRAPH_LIBRARY_PATH);
-
-        VirtualFile graphLibFolder = FileChooser.chooseFile(folderChooserDescriptor, project, project.getBaseDir());
+        VirtualFile graphLibFolder = new FileChooserDialogManager.Builder(project)
+                .setFileTypes(FileTypes.FOLDER)
+                .setTitle(Strings.TITLE_ASK_GRAPH_LIBRARY_PATH)
+                .setDescription(Strings.MESSAGE_ASK_GRAPH_LIBRARY_PATH)
+                .create()
+                .getSelectedFile();
 
         if (graphLibFolder != null) {
             graphLibPath = graphLibFolder.getPath();
@@ -71,13 +74,13 @@ public class DisplayGraphAction extends AnAction {
     }
 
     private void chooseAndSaveApkFile(Project project) {
-        FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false);
-
-        fileChooserDescriptor.setDescription(Strings.MESSAGE_ASK_APK_FILE);
-        fileChooserDescriptor.setTitle(Strings.TITLE_ASK_APK_FILE);
-        fileChooserDescriptor.withFileFilter(virtualFile -> Objects.equals(virtualFile.getExtension(), "apk"));
-
-        VirtualFile apkFile = FileChooser.chooseFile(fileChooserDescriptor, project, project.getBaseDir());
+        VirtualFile apkFile = new FileChooserDialogManager.Builder(project)
+                .setFileTypes(FileTypes.FILE)
+                .setTitle(Strings.TITLE_ASK_APK_FILE)
+                .setDescription(Strings.MESSAGE_ASK_APK_FILE)
+                .withFileFilter("apk")
+                .create()
+                .getSelectedFile();
 
         if (apkFile != null) {
             apkPath = apkFile.getPath();
@@ -90,7 +93,7 @@ public class DisplayGraphAction extends AnAction {
         if (progressIndicator != null) {
             progressIndicator.start();
         }
-        Task task = new Task.Backgroundable(project, "Generating Dependency Graph", true) {
+        Task task = new Task.Backgroundable(project, Strings.PROGRESSING_TEXT, true) {
             @Override
             public void run(@NotNull ProgressIndicator progressIndicator) {
                 try {
@@ -132,7 +135,7 @@ public class DisplayGraphAction extends AnAction {
         task.queue();
     }
 
-    private void printCommandOutput(Process process) throws IOException {
+    /*private void printCommandOutput(Process process) throws IOException {
         BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -149,5 +152,5 @@ public class DisplayGraphAction extends AnAction {
         while ((s = stdError.readLine()) != null) {
             System.out.println(s);
         }
-    }
+    }*/
 }
