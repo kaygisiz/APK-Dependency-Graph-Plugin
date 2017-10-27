@@ -18,5 +18,5 @@ _or_
 
 ### Optional
 
-- Go to `Tools → Dependency Graph → Set Package Filter` enter `package name` (e.g. `**com.example.package**`) as a filter so you will avoid unnecessary dependencies in your graph, default parameter is `nofilter`.
+- Go to `Tools → Dependency Graph → Set Package Filter` enter `package name` (e.g. **com.example.package**) as a filter so you will avoid unnecessary dependencies in your graph, default parameter is `nofilter`.
 - Select `Tools → Dependency Graph → Disable Inner Classes` to define if you want to skip inner classes on your graph or not.
