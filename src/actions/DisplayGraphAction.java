@@ -1,12 +1,7 @@
 package actions;
 
-import com.google.wireless.android.sdk.stats.GradleAndroidModule;
-import com.google.wireless.android.sdk.stats.GradleBuildDetails;
-import com.google.wireless.android.sdk.stats.GradleBuildVariant;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.externalSystem.util.ExternalSystemUtil;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -14,23 +9,17 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.Url;
 import graph.GraphMain;
 import managers.PropertiesManager;
 import org.apache.http.util.TextUtils;
-import org.brut.androlib.AndrolibException;
-import org.brut.androlib.ApkDecoder;
-import org.brut.apktool.ApktoolMain;
-import org.brut.common.BrutException;
+import brut.apktool.ApktoolMain;
+import brut.common.BrutException;
 import org.jetbrains.annotations.NotNull;
 import utils.PropertyKeys;
 import utils.Strings;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
