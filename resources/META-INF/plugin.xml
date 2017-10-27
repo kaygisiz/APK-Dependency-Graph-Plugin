@@ -33,8 +33,6 @@
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt G"/>
             </action>
             <action id="PackageFilter" class="actions.SetPackageFilter" text="Set Package Filter..."/>
-            <action id="SetGraphLibraryPath" class="actions.SetDependencyGraphAction"
-                    text="Set Apk-Dependency-Graph Path..."/>
             <action id="SetApkPath" class="actions.SetApkPathAction" text="Set Apk Path..."/>
             <action id="SetInnerClassMode" class="actions.SetInnerClassMode" text="Enable/Disable Inner Classes"
                     description="Defines whether you want to skip inner classes on your graph (true to skip, false otherwise)."/>

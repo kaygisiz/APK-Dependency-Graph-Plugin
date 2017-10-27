@@ -1,7 +1,12 @@
 package actions;
 
+import com.google.wireless.android.sdk.stats.GradleAndroidModule;
+import com.google.wireless.android.sdk.stats.GradleBuildDetails;
+import com.google.wireless.android.sdk.stats.GradleBuildVariant;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -9,12 +14,16 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import managers.FileChooserDialogManager;
+import com.intellij.util.Url;
+import graph.GraphMain;
 import managers.PropertiesManager;
-import org.jetbrains.annotations.NotNull;
-import utils.FileTypes;
-import utils.PropertyKeys;
 import org.apache.http.util.TextUtils;
+import org.brut.androlib.AndrolibException;
+import org.brut.androlib.ApkDecoder;
+import org.brut.apktool.ApktoolMain;
+import org.brut.common.BrutException;
+import org.jetbrains.annotations.NotNull;
+import utils.PropertyKeys;
 import utils.Strings;
 
 import java.awt.*;
@@ -22,135 +31,83 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Objects;
 
 public class DisplayGraphAction extends AnAction {
 
-    private String graphLibPath;
+    private final ProgressIndicator progressIndicator = ProgressManager.getInstance().getProgressIndicator();
 
     private String apkPath;
 
+    private String decompiledFilesPath;
+
+    private String analyzedJsPath;
+
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
-        // TODO: insert action logic here
         Project project = anActionEvent.getProject();
 
-        if (project != null) {
+        decompiledFilesPath = project.getBasePath() + "/OUTPUT";
 
-            graphLibPath = PropertiesManager.getData(PropertyKeys.GRAPH_LIBRARY_PATH);
+        analyzedJsPath = getClass().getResource("/web").getPath().replace("%20", " ") + "/analyzed.js";
 
-            if (TextUtils.isEmpty(graphLibPath)) {
-                chooseAndSaveGraphDir(project);
-            }
+        apkPath = PropertiesManager.getData(project, PropertyKeys.APK_PATH);
 
-            apkPath = PropertiesManager.getData(project, PropertyKeys.APK_PATH);
-
-            if (TextUtils.isEmpty(apkPath) && !TextUtils.isEmpty(graphLibPath)) {
-                chooseAndSaveApkFile(project);
-            }
-
-            String packageName = PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME, Strings.NO_FILTER);
-
-            String isInnerClassEnabled = PropertiesManager.getData(project, PropertyKeys.IS_INNER_CLASS_ENABLE, Strings.TRUE);
-
-            if (!TextUtils.isEmpty(apkPath) && !TextUtils.isEmpty(graphLibPath)) {
-                runCommandOnTask(project, "run.bat \"" + apkPath + "\" " + packageName + " " + isInnerClassEnabled);
-            }
+        if (TextUtils.isEmpty(apkPath)) {
+            chooseAndSaveApkFile(project);
         }
-    }
 
-    private void chooseAndSaveGraphDir(Project project) {
-        VirtualFile graphLibFolder = new FileChooserDialogManager.Builder(project)
-                .setFileTypes(FileTypes.FOLDER)
-                .setTitle(Strings.TITLE_ASK_GRAPH_LIBRARY_PATH)
-                .setDescription(Strings.MESSAGE_ASK_GRAPH_LIBRARY_PATH)
-                .create()
-                .getSelectedFile();
+        String packageName = PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME, Strings.NO_FILTER);
 
-        if (graphLibFolder != null) {
-            graphLibPath = graphLibFolder.getPath();
-            PropertiesManager.putData(PropertyKeys.GRAPH_LIBRARY_PATH, graphLibPath);
+        String isInnerClassEnabled = PropertiesManager.getData(project, PropertyKeys.IS_INNER_CLASS_ENABLE, Strings.TRUE);
+        if (!TextUtils.isEmpty(apkPath)) {
+            String[] apktoolArgs = new String[]{"d", apkPath, "-o", decompiledFilesPath, "-f"};
+            String[] graphArgs = new String[]{"-i", decompiledFilesPath, "-o", analyzedJsPath, "-f", packageName, "-d", isInnerClassEnabled};
+            Task task = new Task.Backgroundable(project, Strings.BACKGROUNDABLE_PROGRESS_TITLE, true) {
+                @Override
+                public void run(@NotNull ProgressIndicator progIndicator) {
+                    try {
+                        ApktoolMain.main(apktoolArgs);
+                        GraphMain.main(graphArgs);
+                    } catch (IOException | BrutException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onSuccess() {
+                    super.onSuccess();
+                    URL url = getClass().getResource("/web/index.html");
+                    try {
+                        Desktop.getDesktop().browse(url.toURI());
+                    } catch (IOException | URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFinished() {
+                    super.onFinished();
+                }
+            };
+            task.queue();
         }
     }
 
     private void chooseAndSaveApkFile(Project project) {
-        VirtualFile apkFile = new FileChooserDialogManager.Builder(project)
-                .setFileTypes(FileTypes.FILE)
-                .setTitle(Strings.TITLE_ASK_APK_FILE)
-                .setDescription(Strings.MESSAGE_ASK_APK_FILE)
-                .withFileFilter("apk")
-                .create()
-                .getSelectedFile();
+        FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false);
+
+        fileChooserDescriptor.setDescription(Strings.MESSAGE_ASK_APK_FILE);
+        fileChooserDescriptor.setTitle(Strings.TITLE_ASK_APK_FILE);
+        fileChooserDescriptor.withFileFilter(virtualFile -> Objects.equals(virtualFile.getExtension(), "apk"));
+
+        VirtualFile apkFile = FileChooser.chooseFile(fileChooserDescriptor, project, project.getBaseDir());
 
         if (apkFile != null) {
             apkPath = apkFile.getPath();
             PropertiesManager.putData(project, PropertyKeys.APK_PATH, apkPath);
         }
     }
-
-    private void runCommandOnTask(Project project, String command) {
-        ProgressIndicator progressIndicator = ProgressManager.getInstance().getProgressIndicator();
-        if (progressIndicator != null) {
-            progressIndicator.start();
-        }
-        Task task = new Task.Backgroundable(project, Strings.PROGRESSING_TEXT, true) {
-            @Override
-            public void run(@NotNull ProgressIndicator progressIndicator) {
-                try {
-                    ProcessBuilder builder = new ProcessBuilder("cmd", "/c", command);
-                    System.out.println("Command: " + command);
-                    File builderDir = new File(graphLibPath);
-                    builder.directory(builderDir);
-                    builder.redirectErrorStream(true);
-                    builder.start().waitFor();
-                } catch (InterruptedException | IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    progressIndicator.stop();
-                }
-            }
-
-            @Override
-            public void onSuccess() {
-                super.onSuccess();
-                try {
-                    File outputFile = new File(graphLibPath + "\\gui\\index.html");
-                    Desktop.getDesktop().browse(outputFile.toURI());
-                    if (progressIndicator != null) {
-                        progressIndicator.stop();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFinished() {
-                super.onFinished();
-                if (progressIndicator != null && progressIndicator.isRunning()) {
-                    progressIndicator.stop();
-                }
-            }
-        };
-        task.queue();
-    }
-
-    /*private void printCommandOutput(Process process) throws IOException {
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-        // read the output from the command
-        System.out.println("Here is the standard output of the command:\n");
-        String s;
-        while ((s = stdInput.readLine()) != null) {
-            System.out.println(s);
-        }
-
-        // read any errors from the attempted command
-        System.out.println("\nHere is the standard error of the command (if any):\n");
-        while ((s = stdError.readLine()) != null) {
-            System.out.println(s);
-        }
-    }*/
 }

@@ -5,4 +5,5 @@ public class PropertyKeys {
     public static final String GRAPH_LIBRARY_PATH = "GRAPH_LIBRARY_PATH";
     public static final String PACKAGE_NAME = "PACKAGE_NAME";
     public static final String IS_INNER_CLASS_ENABLE = "IS_INNER_CLASS_ENABLE";
+    public static final String PROJECT_BASE_PATH = "PROJECT_BASE_PATH";
 }

@@ -1,0 +1,37 @@
+// $ANTLR 2.7.0a11: preproc.g -> PreprocessorTokenTypes.txt$
+Preprocessor    // output token vocab name
+LITERAL_tokens="tokens"=4
+HEADER_ACTION=5
+ACTION=6
+LITERAL_class="class"=7
+ID=8
+LITERAL_extends="extends"=9
+SEMI=10
+TOKENS_SPEC=11
+OPTIONS_START=12
+ASSIGN_RHS=13
+RCURLY=14
+LITERAL_protected="protected"=15
+LITERAL_private="private"=16
+LITERAL_public="public"=17
+BANG=18
+ARG_ACTION=19
+LITERAL_returns="returns"=20
+RULE_BLOCK=21
+LITERAL_exception="exception"=22
+LITERAL_catch="catch"=23
+SUBRULE_BLOCK=24
+ALT=25
+ELEMENT=26
+ID_OR_KEYWORD=27
+CURLY_BLOCK_SCARF=28
+WS=29
+NEWLINE=30
+COMMENT=31
+SL_COMMENT=32
+ML_COMMENT=33
+CHAR_LITERAL=34
+STRING_LITERAL=35
+ESC=36
+DIGIT=37
+XDIGIT=38
