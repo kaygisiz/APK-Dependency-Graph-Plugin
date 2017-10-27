@@ -11,7 +11,12 @@ _or_
 
 ## How to use
 
-1. Download to `apk-dependency-graph`(http://github.com/alexzaitsev/apk-dependency-graph) tool
-2. Go to `Settings → Instan Run` in Android Studio and **disable** `Enable Instant Run to hot swap code/resource changes on deploy`
-3. Build Apk with disabled Instant Run
-4. Click `Tools → Dependency Graph → Display Graph`
+1. Go to `Settings → Instan Run` in Android Studio and **disable** `Enable Instant Run to hot swap code/resource changes on deploy`
+2. Build Apk with disabled Instant Run
+3. Click `Tools → Dependency Graph → Display Graph`
+4. Select apk file
+
+### Optional
+
+- Go to `Tools → Dependency Graph → Set Package Filter` enter `package name` (e.g. `**com.example.package**`) as a filter so you will avoid unnecessary dependencies in your graph, default parameter is `nofilter`.
+- Select `Tools → Dependency Graph → Disable Inner Classes` to define if you want to skip inner classes on your graph or not.
