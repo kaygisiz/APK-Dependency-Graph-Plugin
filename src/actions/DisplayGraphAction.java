@@ -15,12 +15,10 @@
  */
 package actions;
 
+import brut.apktool.Main;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -28,7 +26,6 @@ import graph.GraphMain;
 import managers.FileChooserDialogManager;
 import managers.PropertiesManager;
 import org.apache.http.util.TextUtils;
-import brut.apktool.ApktoolMain;
 import brut.common.BrutException;
 import org.jetbrains.annotations.NotNull;
 import utils.FileTypes;
@@ -39,7 +36,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 
 public class DisplayGraphAction extends AnAction {
     private String apkPath;
@@ -73,7 +69,7 @@ public class DisplayGraphAction extends AnAction {
                 @Override
                 public void run(@NotNull ProgressIndicator progIndicator) {
                     try {
-                        ApktoolMain.main(apktoolArgs);
+                        Main.main(apktoolArgs);
                         GraphMain.main(graphArgs);
                     } catch (IOException | BrutException | InterruptedException e) {
                         e.printStackTrace();
