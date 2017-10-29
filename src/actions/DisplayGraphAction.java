@@ -1,3 +1,18 @@
+/**
+ *  Copyright (C) 2017 Necati Caner Gaygisiz
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
@@ -10,11 +25,13 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import graph.GraphMain;
+import managers.FileChooserDialogManager;
 import managers.PropertiesManager;
 import org.apache.http.util.TextUtils;
 import brut.apktool.ApktoolMain;
 import brut.common.BrutException;
 import org.jetbrains.annotations.NotNull;
+import utils.FileTypes;
 import utils.PropertyKeys;
 import utils.Strings;
 
@@ -25,9 +42,6 @@ import java.net.URL;
 import java.util.Objects;
 
 public class DisplayGraphAction extends AnAction {
-
-    private final ProgressIndicator progressIndicator = ProgressManager.getInstance().getProgressIndicator();
-
     private String apkPath;
 
     private String decompiledFilesPath;
@@ -51,6 +65,7 @@ public class DisplayGraphAction extends AnAction {
         String packageName = PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME, Strings.NO_FILTER);
 
         String isInnerClassEnabled = PropertiesManager.getData(project, PropertyKeys.IS_INNER_CLASS_ENABLE, Strings.TRUE);
+
         if (!TextUtils.isEmpty(apkPath)) {
             String[] apktoolArgs = new String[]{"d", apkPath, "-o", decompiledFilesPath, "-f"};
             String[] graphArgs = new String[]{"-i", decompiledFilesPath, "-o", analyzedJsPath, "-f", packageName, "-d", isInnerClassEnabled};
@@ -75,24 +90,19 @@ public class DisplayGraphAction extends AnAction {
                         e.printStackTrace();
                     }
                 }
-
-                @Override
-                public void onFinished() {
-                    super.onFinished();
-                }
             };
             task.queue();
         }
     }
 
     private void chooseAndSaveApkFile(Project project) {
-        FileChooserDescriptor fileChooserDescriptor = new FileChooserDescriptor(true, false, false, false, false, false);
-
-        fileChooserDescriptor.setDescription(Strings.MESSAGE_ASK_APK_FILE);
-        fileChooserDescriptor.setTitle(Strings.TITLE_ASK_APK_FILE);
-        fileChooserDescriptor.withFileFilter(virtualFile -> Objects.equals(virtualFile.getExtension(), "apk"));
-
-        VirtualFile apkFile = FileChooser.chooseFile(fileChooserDescriptor, project, project.getBaseDir());
+        VirtualFile apkFile = new FileChooserDialogManager.Builder(project)
+                .setFileTypes(FileTypes.FILE)
+                .setTitle(Strings.TITLE_ASK_APK_FILE)
+                .setDescription(Strings.MESSAGE_ASK_APK_FILE)
+                .withFileFilter("apk")
+                .create()
+                .getSelectedFile();
 
         if (apkFile != null) {
             apkPath = apkFile.getPath();
