@@ -1,4 +1,4 @@
-# Dependency-Graph-Plugin
+# Dependency Injection Graph
 
 Simple plugin for Android Studio that allows display graph of dependency injections.
 
