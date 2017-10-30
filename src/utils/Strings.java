@@ -27,4 +27,10 @@ public class Strings {
     public final static String NO_FILTER = "nofilter";
 
     public final static String BACKGROUNDABLE_PROGRESS_TITLE = "Generating Dependency Injection Graph";
+
+    public final static String TITLE_ERROR_SHOW_GENERATED_DEPENDENCIES = "Generated Dependencies Not Found";
+    public final static String ERROR_SHOW_GENERATED_DEPENDENCIES = "You need to generate dependency injection graph first.";
+
+    public final static String TITLE_ERROR_INSTANT_RUN_ENABLED = "Instant Run Error";
+    public final static String ERROR_INSTANT_RUN_ENABLED = "Please disable Instant Run feature from settings and build apk again.";
 }

@@ -12,7 +12,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.intellij.openapi.ui.Messages;
 import graph.io.Arguments;
+import utils.Strings;
 
 public class SmaliAnalyzer {
 
@@ -48,6 +50,7 @@ public class SmaliAnalyzer {
             return true;
         } else if (isInstantRunEnabled()) {
             System.err.println("Enabled Instant Run feature detected. We cannot decompile it. Please, disable Instant Run and rebuild your app.");
+            Messages.showInfoMessage(Strings.ERROR_INSTANT_RUN_ENABLED, Strings.TITLE_ERROR_INSTANT_RUN_ENABLED);
         } else {
             System.err.println("Smali folder cannot be absent!");
         }
@@ -90,12 +93,12 @@ public class SmaliAnalyzer {
 
             String fileName = file.getName().substring(0, file.getName().lastIndexOf("."));
 
-            if (CodeUtils.isClassR(fileName)) {
+            if (isClassR(fileName)) {
                 return;
             }
 
-            if (CodeUtils.isClassAnonymous(fileName)) {
-                fileName = CodeUtils.getAnonymousNearestOuter(fileName);
+            if (isClassAnonymous(fileName)) {
+                fileName = getAnonymousNearestOuter(fileName);
             }
 
             Set<String> classNames = new HashSet<>();
@@ -121,8 +124,8 @@ public class SmaliAnalyzer {
             }
 
             // inner/nested class always depends on the outer class
-            if (CodeUtils.isClassInner(fileName)) {
-                dependencyNames.add(CodeUtils.getOuterClass(fileName));
+            if (isClassInner(fileName)) {
+                dependencyNames.add(getOuterClass(fileName));
             }
 
             if (!dependencyNames.isEmpty()) {
@@ -154,8 +157,8 @@ public class SmaliAnalyzer {
      * @return true if class is good with these conditions
      */
     private boolean isClassOk(String simpleClassName, String fileName) {
-        return !CodeUtils.isClassAnonymous(simpleClassName) && !CodeUtils.isClassGenerated(simpleClassName)
-                && !fileName.equals(simpleClassName) && !CodeUtils.isClassR(simpleClassName);
+        return !isClassAnonymous(simpleClassName) && !isClassGenerated(simpleClassName)
+                && !fileName.equals(simpleClassName) && !isClassR(simpleClassName);
     }
 
     private void parseAndAddClassNames(Set<String> classNames, String line) {
@@ -231,4 +234,48 @@ public class SmaliAnalyzer {
         }
         return filteredDependencies;
     }
+
+    private boolean isClassR(String className) {
+        return className != null && className.equals("R") || className.startsWith("R$");
+    }
+
+    private boolean isClassGenerated(String className) {
+        return className != null && className.contains("$$");
+    }
+
+    private boolean isClassInner(String className) {
+        return className != null && className.contains("$") && !isClassAnonymous(className) && !isClassGenerated(className);
+    }
+
+    private String getOuterClass(String className) {
+        return className.substring(0, className.lastIndexOf("$"));
+    }
+
+    private boolean isClassAnonymous(String className) {
+        return className != null && className.contains("$")
+                && isNumber(className.substring(className.lastIndexOf("$") + 1, className.length()));
+    }
+
+    private String getAnonymousNearestOuter(String className) {
+        String[] classes = className.split("\\$");
+        for (int i = 0; i < classes.length; i++) {
+            if (isNumber(classes[i])) {
+                String anonHolder = "";
+                for (int j = 0; j < i; j++) {
+                    anonHolder += classes[j] + (j == i - 1 ? "" : "$");
+                }
+                return anonHolder;
+            }
+        }
+        return null;
+    }
+
+    private boolean isNumber(String str) {
+        for (char c : str.toCharArray()) {
+            if (!Character.isDigit(c))
+                return false;
+        }
+        return true;
+    }
+
 }
