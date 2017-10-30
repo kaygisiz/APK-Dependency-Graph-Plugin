@@ -3,7 +3,7 @@
 Simple plugin for Android Studio that allows display graph of dependency injections.
 
 ## How to install
-- in Android Studio: go to `Settings → Plugins → Browse repositories` and search for `Dependency Graph Plugin`
+- in Android Studio: go to `Settings → Plugins → Browse repositories` and search for `Dependency Injection Graph`
 
 _or_
 
@@ -13,10 +13,11 @@ _or_
 
 1. Go to `Settings → Instan Run` in Android Studio and **disable** `Enable Instant Run to hot swap code/resource changes on deploy`
 2. Build Apk with disabled Instant Run
-3. Click `Tools → Dependency Graph → Display Graph`
+3. Click `Tools → Dependency Injection Graph → Generate Dependency Injection Graph`
 4. Select apk file
 
 ### Optional
 
-- Go to `Tools → Dependency Graph → Set Package Filter` enter `package name` (e.g. **com.example.package**) as a filter so you will avoid unnecessary dependencies in your graph, default parameter is `nofilter`.
-- Select `Tools → Dependency Graph → Disable Inner Classes` to define if you want to skip inner classes on your graph or not.
+- Go to `Tools → Dependency Injection Graph → Show Generated Dependencies` to see last generated dependencies graph of current project in browser.
+- Go to `Tools → Dependency Injection Graph → Set Package Filter` enter `package name` (e.g. **com.example.package**) as a filter so you will avoid unnecessary dependencies in your graph, default parameter is `nofilter`.
+- Select `Tools → Dependency Injection Graph → Disable Inner Classes` to define if you want to skip inner classes on your graph or not.
