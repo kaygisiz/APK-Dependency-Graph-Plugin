@@ -55,7 +55,7 @@ public class ShowGeneratedDependencies extends AnAction {
     }
 
     private void initFiles(Project project) {
-        webPath = project.getBasePath() + "/dig/web";
+        webPath = project.getBasePath() + "/.dig/web";
 
         analyzedJsPath = webPath + "/analyzed.js";
 

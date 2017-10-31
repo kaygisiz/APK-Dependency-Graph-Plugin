@@ -36,7 +36,7 @@ public class SetPackageFilter extends AnAction {
                     Strings.MESSAGE_ASK_PACKAGE_NAME_TO_FILTER,
                     Strings.TITLE_ASK_PACKAGE_NAME_TO_FILTER,
                     Messages.getQuestionIcon(),
-                    PropertiesComponent.getInstance(project).getValue(PropertyKeys.PACKAGE_NAME, Strings.NO_FILTER),
+                    PropertiesComponent.getInstance(project).getValue(PropertyKeys.PACKAGE_NAME),
                     new NonEmptyInputValidator());
 
             if (!TextUtils.isEmpty(packageName)) {
