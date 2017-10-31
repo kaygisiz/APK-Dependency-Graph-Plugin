@@ -22,6 +22,7 @@ import com.intellij.openapi.ui.Messages;
 import managers.PropertiesManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.util.TextUtils;
+import utils.PathHelper;
 import utils.PropertyKeys;
 import utils.Strings;
 
@@ -32,20 +33,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class ShowGeneratedDependencies extends AnAction {
-    private String webPath;
 
-    private String analyzedJsPath;
-
-    private String htmlPath;
+    private PathHelper pathHelper;
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
         Project project = anActionEvent.getProject();
         if (project != null) {
 
-            initFiles(project);
+            pathHelper = new PathHelper(project);
 
-            if (new File(analyzedJsPath).exists()) {
+            if (new File(pathHelper.getAnalyzedJsFile()).exists()) {
                 openBrowser();
             } else {
                 Messages.showInfoMessage(Strings.ERROR_SHOW_GENERATED_DEPENDENCIES, Strings.TITLE_ERROR_SHOW_GENERATED_DEPENDENCIES);
@@ -54,17 +52,9 @@ public class ShowGeneratedDependencies extends AnAction {
         }
     }
 
-    private void initFiles(Project project) {
-        webPath = project.getBasePath() + "/dig/web";
-
-        analyzedJsPath = webPath + "/analyzed.js";
-
-        htmlPath = webPath + "/index.html";
-    }
-
     private void openBrowser() {
         try {
-            Desktop.getDesktop().browse(new File(htmlPath).toURI());
+            Desktop.getDesktop().browse(new File(pathHelper.getIndexHtmlFile()).toURI());
         } catch (IOException e) {
             e.printStackTrace();
         }
