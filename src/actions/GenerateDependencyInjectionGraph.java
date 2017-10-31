@@ -20,6 +20,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -33,6 +34,7 @@ import org.apache.http.util.TextUtils;
 import brut.common.BrutException;
 import org.jetbrains.annotations.NotNull;
 import utils.FileTypes;
+import utils.PathHelper;
 import utils.PropertyKeys;
 import utils.Strings;
 
@@ -43,15 +45,7 @@ import java.io.IOException;
 public class GenerateDependencyInjectionGraph extends AnAction {
     private String apkPath;
 
-    private String digPath;
-
-    private String decompiledFilesPath;
-
-    private String webPath;
-
-    private String analyzedJsPath;
-
-    private String htmlPath;
+    private PathHelper pathHelper;
 
     private String packageName;
 
@@ -89,22 +83,17 @@ public class GenerateDependencyInjectionGraph extends AnAction {
     }
 
     private void initFiles(Project project) throws IOException {
-        digPath = project.getBasePath() + "/.dig";
 
-        decompiledFilesPath = digPath + "/decompiled";
-
-        webPath = digPath + "/web";
-
-        analyzedJsPath = webPath + "/analyzed.js";
-
-        htmlPath = webPath + "/index.html";
+        pathHelper = new PathHelper(project);
 
         apkPath = PropertiesManager.getData(project, PropertyKeys.APK_PATH);
 
-        File webDir = new File(webPath);
-        File webResourceDir = new File(getClass().getResource("/web").getPath().replace("%20", " "));
+        File webDir = new File(pathHelper.getWebDir());
         if (!webDir.exists()) {
-            FileUtil.copyDir(webResourceDir, webDir);
+            FileUtil.copyDir(
+                    new File(pathHelper.replaceCharWithSpace(getClass().getResource("/web").getPath())),
+                    webDir
+            );
         }
     }
 
@@ -113,8 +102,8 @@ public class GenerateDependencyInjectionGraph extends AnAction {
             @Override
             public void run(@NotNull ProgressIndicator progIndicator) {
                 try {
-                    Main.main(new String[]{"d", apkPath, "-o", decompiledFilesPath, "-f"});
-                    GraphMain.main(new String[]{"-i", decompiledFilesPath, "-o", analyzedJsPath, "-f", packageName, "-d", isInnerClassEnabled});
+                    Main.main(new String[]{"d", apkPath, "-o", pathHelper.getDecompiledDir(), "-f"});
+                    GraphMain.main(new String[]{"-i", pathHelper.getDecompiledDir(), "-o", pathHelper.getAnalyzedJsFile(), "-f", packageName, "-d", isInnerClassEnabled});
                 } catch (IOException | BrutException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -124,8 +113,8 @@ public class GenerateDependencyInjectionGraph extends AnAction {
             public void onSuccess() {
                 super.onSuccess();
                 try {
-                    Desktop.getDesktop().browse(new File(htmlPath).toURI());
-                    FileUtil.asyncDelete(new File(decompiledFilesPath));
+                    Desktop.getDesktop().browse(new File(pathHelper.getIndexHtmlFile()).toURI());
+                    FileUtil.asyncDelete(new File(pathHelper.getDecompiledDir()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -153,12 +142,12 @@ public class GenerateDependencyInjectionGraph extends AnAction {
                 Strings.MESSAGE_ASK_PACKAGE_NAME_TO_FILTER,
                 Strings.TITLE_ASK_PACKAGE_NAME_TO_FILTER,
                 Messages.getQuestionIcon(),
-                PropertiesComponent.getInstance(project).getValue(PropertyKeys.PACKAGE_NAME, ""),
+                PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME),
                 new NonEmptyInputValidator());
 
         if (!TextUtils.isEmpty(packageName)) {
             this.packageName = packageName;
-            PropertiesComponent.getInstance(project).setValue(PropertyKeys.PACKAGE_NAME, packageName);
+            PropertiesManager.putData(project, PropertyKeys.PACKAGE_NAME, packageName);
         }
     }
 
