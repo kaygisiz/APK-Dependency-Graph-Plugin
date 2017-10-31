@@ -14,10 +14,10 @@ _or_
 1. Go to `Settings → Instan Run` in Android Studio and **disable** `Enable Instant Run to hot swap code/resource changes on deploy`
 2. Build Apk with disabled Instant Run
 3. Click `Tools → Dependency Injection Graph → Generate Dependency Injection Graph`
-4. Select apk file
+4. Select apk file from shown dialog
+5. Click `Tools → Dependency Injection Graph → Set Package Filter` enter `package name` (e.g. **com.example.package**) as a filter so you will avoid unnecessary dependencies in your graph.
 
 ### Optional
 
 - Go to `Tools → Dependency Injection Graph → Show Generated Dependencies` to see last generated dependencies graph of current project in browser.
-- Go to `Tools → Dependency Injection Graph → Set Package Filter` enter `package name` (e.g. **com.example.package**) as a filter so you will avoid unnecessary dependencies in your graph, default parameter is `nofilter`.
 - Select `Tools → Dependency Injection Graph → Disable Inner Classes` to define if you want to skip inner classes on your graph or not.
