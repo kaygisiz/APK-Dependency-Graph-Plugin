@@ -1,0 +1,45 @@
+<idea-plugin>
+    <id>com.kaygisiz.dependencygraph</id>
+    <name>Dependency Injection Graph</name>
+    <version>2.1</version>
+    <vendor email="voidideas@gmail.com" url="https://github.com/kaygisiz/Dependency-Injection-Graph">Void Ideas</vendor>
+
+    <description><![CDATA[
+      Simple plugin for Android Studio that allows display graph of dependency injections.<br>
+    ]]></description>
+    <!-- <em>most HTML tags may be used</em> -->
+
+    <!-- <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+    </change-notes> -->
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="145.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.androidstudio</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <group id="Dependency Injection Graph" text="Dependency Injection Graph" popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <action id="GenerateDependencyInjectionGraph" class="actions.GenerateDependencyInjectionGraph" text="Generate Dependency Injection Graph">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
+            </action>
+            <action id="ShowGeneratedDependencies" class="actions.ShowGeneratedDependencies" text="Show Generated Dependencies">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift B"/>
+            </action>
+            <action id="PackageFilter" class="actions.SetPackageFilter" text="Set Package Filter..."/>
+            <action id="SetApkPath" class="actions.SetApkPathAction" text="Set Apk Path..."/>
+            <action id="SetInnerClassMode" class="actions.SetInnerClassMode" text="Enable/Disable Inner Classes"
+                    description="Defines whether you want to skip inner classes on your graph (true to skip, false otherwise)."/>
+        </group>
+    </actions>
+
+</idea-plugin>
