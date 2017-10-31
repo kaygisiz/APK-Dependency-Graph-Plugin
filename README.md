@@ -1,6 +1,6 @@
 # Dependency Injection Graph
 
-Simple plugin for Android Studio that allows display graph of dependency injections.
+Dependency Injection Graph is a plugin for Android Studio that allows display graph of dependency injections.
 
 ## How to install
 - in Android Studio: go to `Settings → Plugins → Browse repositories` and search for `Dependency Injection Graph`
