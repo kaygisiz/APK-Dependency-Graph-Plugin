@@ -21,3 +21,8 @@ _or_
 
 - Go to `Tools → Dependency Injection Graph → Show Generated Dependencies` to see last generated dependencies graph of current project in browser.
 - Select `Tools → Dependency Injection Graph → Disable Inner Classes` to define if you want to skip inner classes on your graph or not.
+
+## Credits
+
+Thanks to [Alex Zaitsev](https://github.com/alexzaitsev). I have inspired by his project: https://github.com/alexzaitsev/apk-dependency-graph  
+I used source codes of this project to analyze dependencies of decompiled apk, web scripts to show these dependencies in browser.
