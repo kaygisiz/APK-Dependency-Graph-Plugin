@@ -24,5 +24,5 @@ _or_
 
 ## Credits
 
-Thanks to [Alex Zaitsev](https://github.com/alexzaitsev). I have inspired by his project: https://github.com/alexzaitsev/apk-dependency-graph
+Thanks to [Alex Zaitsev](https://github.com/alexzaitsev). I have inspired by his project: https://github.com/alexzaitsev/apk-dependency-graph	
 I used source codes of this project to analyze dependencies of decompiled apk, web scripts to show these dependencies in browser.
