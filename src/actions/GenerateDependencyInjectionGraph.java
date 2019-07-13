@@ -15,23 +15,19 @@
  */
 package actions;
 
-import brut.apktool.Main;
-import com.intellij.ide.util.PropertiesComponent;
+import code.Main;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.NonEmptyInputValidator;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import graph.GraphMain;
 import managers.FileChooserDialogManager;
 import managers.PropertiesManager;
 import org.apache.http.util.TextUtils;
-import brut.common.BrutException;
 import org.jetbrains.annotations.NotNull;
 import utils.FileTypes;
 import utils.PathHelper;
@@ -101,12 +97,7 @@ public class GenerateDependencyInjectionGraph extends AnAction {
         return new Task.Backgroundable(project, Strings.BACKGROUNDABLE_PROGRESS_TITLE, true) {
             @Override
             public void run(@NotNull ProgressIndicator progIndicator) {
-                try {
-                    Main.main(new String[]{"d", apkPath, "-o", pathHelper.getDecompiledDir(), "-f"});
-                    GraphMain.main(new String[]{"-i", pathHelper.getDecompiledDir(), "-o", pathHelper.getAnalyzedJsFile(), "-f", packageName, "-d", isInnerClassEnabled});
-                } catch (IOException | BrutException | InterruptedException e) {
-                    e.printStackTrace();
-                }
+                Main.main(new String[]{"-i", pathHelper.getDecompiledDir(), "-o", pathHelper.getAnalyzedJsFile(), "-f", packageName, "-d", isInnerClassEnabled, "-a", apkPath});
             }
 
             @Override
