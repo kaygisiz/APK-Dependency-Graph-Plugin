@@ -20,6 +20,11 @@ patchPluginXml {
       <em>most HTML tags may be used</em>"""
 }
 
+publishPlugin {
+    username intellijPublishUsername
+    password intellijPublishPassword
+}
+
 def pluginOutputDir = "$buildDir/distributions/$project.name"
 
 runIde {
