@@ -13,11 +13,11 @@ intellij {
 }
 
 patchPluginXml {
-    version '2.1'
+    version '2.2'
     sinceBuild '141'
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      <em>Reduce plugin size.</em>
+      <em>Since build version updated.</em>"""
 }
 
 publishPlugin {
