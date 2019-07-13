@@ -4,3 +4,7 @@
 # IDE
 /.idea
 /output
+
+# Gradle
+/build
+/.gradle
