@@ -23,6 +23,7 @@ patchPluginXml {
 publishPlugin {
     username intellijPublishUsername
     password intellijPublishPassword
+    // channels 'beta'
 }
 
 def pluginOutputDir = "$buildDir/distributions/$project.name"
