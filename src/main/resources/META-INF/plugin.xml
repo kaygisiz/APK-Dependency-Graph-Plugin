@@ -5,7 +5,7 @@
     <vendor email="ncanerkaygisiz@gmail.com" url="https://github.com/kaygisiz/Dependency-Injection-Graph">Void Ideas</vendor>
 
     <description><![CDATA[
-      Dependency Injection Graph is a plugin for Android Studio that allows display graph of dependency injections.<br>
+      Displays dependencies between classes as fancy graph.<br>
     ]]></description>
     <!-- <em>most HTML tags may be used</em> -->
 
@@ -31,7 +31,7 @@
             </action>
             <action id="PackageFilter" class="actions.SetPackageFilter" text="Set Package Filter..."/>
             <action id="SetApkPath" class="actions.SetApkPathAction" text="Set Apk Path..."/>
-            <action id="SetInnerClassMode" class="actions.SetInnerClassMode" text="Enable/Disable Inner Classes"
+            <action id="SetInnerClassMode" class="actions.SetInnerClassMode" text="Include Inner Classes"
                     description="Defines whether you want to skip inner classes on your graph (true to skip, false otherwise)."/>
         </group>
     </actions>
