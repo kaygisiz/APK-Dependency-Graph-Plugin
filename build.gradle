@@ -9,6 +9,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 }
 
+def publishToken = hasProperty('intellijPublishToken') ? intellijPublishToken : 'fake_token_for_CI'
+
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version '2019.1'
@@ -23,7 +25,7 @@ patchPluginXml {
 }
 
 publishPlugin {
-    token intellijPublishToken
+    token publishToken
     // channels 'beta'
 }
 
