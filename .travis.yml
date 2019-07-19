@@ -4,7 +4,10 @@ install: true
 jdk:
   - oraclejdk8
 
+before_script:
+  - alias gradle="./gradlew --stacktrace -PintellijPublishToken=fake_token"
+
 script:
-  - ./gradlew build --scan -s
-  - ./gradlew verifyPlugin --scan -s
-  - ./gradlew buildPlugin --scan -s
+  - gradle build
+  - gradle verifyPlugin
+  - gradle buildPlugin
