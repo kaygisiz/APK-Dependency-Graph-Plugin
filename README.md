@@ -1,4 +1,5 @@
 # Dependency Injection Graph
+[![Build Status](https://travis-ci.org/kaygisiz/Dependency-Injection-Graph.svg?branch=master)](https://travis-ci.org/kaygisiz/Dependency-Injection-Graph)
 
 Dependency Injection Graph is a plugin for Android Studio that allows display graph of dependency injections.
 

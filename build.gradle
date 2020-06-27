@@ -1,0 +1,75 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.4.9'
+}
+
+sourceCompatibility = 1.8
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+}
+
+def publishToken = hasProperty('intellijPublishToken') ? intellijPublishToken : 'fake_token_for_CI'
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version '2019.1'
+}
+
+patchPluginXml {
+    version '2.2'
+    sinceBuild '141'
+    changeNotes """
+      <em>Reduce plugin size.</em>
+      <em>Since build version updated.</em>"""
+}
+
+publishPlugin {
+    token publishToken
+    // channels 'beta'
+}
+
+def pluginOutputDir = "$buildDir/distributions/$project.name"
+
+runIde {
+    ideaDirectory '/Applications/Android Studio.app/Contents'
+}
+
+task zipPluginOutput(type: Zip) {
+    archiveFileName = project.name + ".zip"
+    destinationDir = file("$buildDir/distributions")
+
+    from "$buildDir/distributions/$project.name"
+    into project.name
+}
+
+task copyWebResources(type: Copy) {
+    from('src/main/resources') {
+        into 'resources'
+    }
+    into pluginOutputDir + "/lib"
+    exclude 'META-INF'
+}
+
+task extractPluginZip(type: Copy) {
+    def zipFile = file(pluginOutputDir + ".zip")
+    def outputDir = file("$buildDir/distributions")
+
+    from zipTree(zipFile)
+    into outputDir
+}
+
+extractPluginZip.doLast {
+    file(pluginOutputDir + ".zip").delete()
+}
+
+zipPluginOutput.doLast {
+    file(pluginOutputDir).deleteDir()
+}
+
+buildPlugin.finalizedBy(extractPluginZip)
+extractPluginZip.finalizedBy(copyWebResources)
+copyWebResources.finalizedBy(zipPluginOutput)
+
+buildSearchableOptions.enabled = false
+jarSearchableOptions.enabled = false
