@@ -4,15 +4,15 @@ import com.intellij.openapi.project.Project;
 
 public class PathHelper {
 
-    private String digPath;
+    private final String digPath;
 
-    private String decompiledFilesPath;
+    private final String decompiledFilesPath;
 
-    private String webPath;
+    private final String webPath;
 
-    private String analyzedJsPath;
+    private final String analyzedJsPath;
 
-    private String htmlPath;
+    private final String htmlPath;
 
     public PathHelper(Project project) {
         digPath = replaceCharWithSpace(project.getBasePath()) + "/.dig";

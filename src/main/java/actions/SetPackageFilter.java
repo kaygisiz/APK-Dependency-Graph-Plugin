@@ -21,8 +21,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.NonEmptyInputValidator;
 import managers.PropertiesManager;
+import org.apache.commons.lang3.StringUtils;
 import utils.PropertyKeys;
-import org.apache.http.util.TextUtils;
 import utils.Strings;
 
 public class SetPackageFilter extends AnAction {
@@ -39,7 +39,7 @@ public class SetPackageFilter extends AnAction {
                     PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME),
                     new NonEmptyInputValidator());
 
-            if (!TextUtils.isEmpty(packageName)) {
+            if (!StringUtils.isEmpty(packageName)) {
                 PropertiesManager.putData(project, PropertyKeys.PACKAGE_NAME, packageName);
             }
         }

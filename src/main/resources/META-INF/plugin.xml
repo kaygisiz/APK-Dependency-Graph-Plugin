@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>com.kaygisiz.dependencygraph</id>
-    <name>Dependency Injection Graph</name>
-    <!-- <version>2.1</version> -->
-    <vendor email="ncanerkaygisiz@gmail.com" url="https://github.com/kaygisiz/Dependency-Injection-Graph">Void Ideas</vendor>
+    <name>APK Dependency Graph</name>
+    <!-- <version>set in build.gradle</version> -->
+    <vendor email="ncanerkaygisiz@gmail.com" url="https://github.com/kaygisiz/APK-Dependency-Graph-Plugin">Kaygisiz</vendor>
 
     <description><![CDATA[
       Displays dependencies between classes as fancy graph.<br>
@@ -21,12 +21,12 @@
     </extensions>
 
     <actions>
-        <group id="Dependency Injection Graph" text="Dependency Injection Graph" popup="true">
+        <group id="Dependency Injection Graph" text="APK Dependency Graph" popup="true">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
-            <action id="GenerateDependencyInjectionGraph" class="actions.GenerateDependencyInjectionGraph" text="Generate Dependency Injection Graph">
+            <action id="GenerateDependencyInjectionGraph" class="actions.GenerateDependencyInjectionGraph" text="Generate Dependency Graph">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift G"/>
             </action>
-            <action id="ShowGeneratedDependencies" class="actions.ShowGeneratedDependencies" text="Show Generated Dependencies">
+            <action id="ShowGeneratedDependencies" class="actions.ShowGeneratedDependencies" text="Show Generated Graph">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl shift B"/>
             </action>
             <action id="PackageFilter" class="actions.SetPackageFilter" text="Set Package Filter..."/>

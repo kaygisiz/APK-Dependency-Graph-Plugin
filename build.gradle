@@ -1,27 +1,53 @@
-plugins {
-    id 'java'
-    id 'org.jetbrains.intellij' version '0.4.9'
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+    }
 }
 
-sourceCompatibility = 1.8
+import proguard.gradle.ProGuardTask
+
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.intellij' version '0.4.21'
+}
+
+version '2.3'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile group: 'org.smali', name: 'baksmali', version: '2.4.0'
+    compile group: 'org.smali', name: 'dexlib2', version: '2.4.0'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
 }
 
+def jarFileName = "${project.name}-${project.version}"
 def publishToken = hasProperty('intellijPublishToken') ? intellijPublishToken : 'fake_token_for_CI'
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    version '2019.1'
-}
 
 patchPluginXml {
-    version '2.2'
+    version version
     sinceBuild '141'
     changeNotes """
-      <em>Reduce plugin size.</em>
-      <em>Since build version updated.</em>"""
+    <h3>v2.3</h3>
+    <h4>Enhancements</h4>
+        <ul>
+            <li>Reduce plugin size.
+            <li>Compatible with Android Studio 4.0.
+            <li>Update plugin name.
+        </ul>
+    """
 }
 
 publishPlugin {
@@ -29,47 +55,53 @@ publishPlugin {
     // channels 'beta'
 }
 
-def pluginOutputDir = "$buildDir/distributions/$project.name"
-
 runIde {
-    ideaDirectory '/Applications/Android Studio.app/Contents'
-}
-
-task zipPluginOutput(type: Zip) {
-    archiveFileName = project.name + ".zip"
-    destinationDir = file("$buildDir/distributions")
-
-    from "$buildDir/distributions/$project.name"
-    into project.name
+    ideDirectory '/Applications/Android Studio.app/Contents'
 }
 
 task copyWebResources(type: Copy) {
     from('src/main/resources') {
         into 'resources'
     }
-    into pluginOutputDir + "/lib"
+    into "${buildDir}/idea-sandbox/plugins/${project.name}/lib"
     exclude 'META-INF'
 }
 
-task extractPluginZip(type: Copy) {
-    def zipFile = file(pluginOutputDir + ".zip")
-    def outputDir = file("$buildDir/distributions")
-
-    from zipTree(zipFile)
-    into outputDir
+prepareSandbox.finalizedBy(copyWebResources)
+prepareSandbox.doLast {
+    delete fileTree("${buildDir}/idea-sandbox/plugins/${project.name}/lib") {
+        exclude "${jarFileName}.jar"
+    }
 }
-
-extractPluginZip.doLast {
-    file(pluginOutputDir + ".zip").delete()
-}
-
-zipPluginOutput.doLast {
-    file(pluginOutputDir).deleteDir()
-}
-
-buildPlugin.finalizedBy(extractPluginZip)
-extractPluginZip.finalizedBy(copyWebResources)
-copyWebResources.finalizedBy(zipPluginOutput)
 
 buildSearchableOptions.enabled = false
 jarSearchableOptions.enabled = false
+
+jar {
+    archiveFileName = "${jarFileName}.jar"
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+def injarPath = "${buildDir}/libs/${jarFileName}.jar"
+def outjarPath = "${buildDir}/proguard/${jarFileName}.jar"
+task proguard(type: ProGuardTask, dependsOn: jar) {
+    configuration 'proguard.txt'
+    printmapping "${project.name}-mapping.txt"
+
+    injars injarPath
+    outjars outjarPath
+
+    def rtPath = 'jre/lib/rt.jar'
+    if (JavaVersion.current() > JavaVersion.VERSION_1_8) {
+        rtPath = 'jmods'
+    }
+    libraryjars "${System.getProperty('java.home')}/${rtPath}"
+    libraryjars project.configurations.compile
+
+    doLast {
+        delete file(injarPath)
+        ant.move(file: outjarPath, tofile: injarPath)
+    }
+}
+
+jar.finalizedBy(proguard)

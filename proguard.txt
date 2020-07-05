@@ -1,0 +1,22 @@
+-renamesourcefileattribute SourceFile
+-dontwarn com.intellij.**
+
+-keep class actions.** { *; }
+-keep class managers.** { *; }
+-keep class utils.** { *; }
+
+-keep class javax.** { *; }
+-keep class java.** { *; }
+
+-keep class org.jf.dexlib2.dexbacked.DexBackedDexFile { *; }
+-keep class org.jf.dexlib2.iface.DexFile { *; }
+-keep class org.jf.dexlib2.dexbacked.DexBackedDexFile { *; }
+-keep class org.jf.dexlib2.DexFileFactory { *; }
+-keep class org.jf.dexlib2.Opcodes { *; }
+-keep class org.jf.dexlib2.Opcode { *; }
+
+-keep class com.google.common.collect.Ordering { *; }
+-keep class org.apache.commons.lang3.StringUtils {
+    boolean isNumeric(java.lang.CharSequence);
+    boolean isEmpty(java.lang.CharSequence);
+}
