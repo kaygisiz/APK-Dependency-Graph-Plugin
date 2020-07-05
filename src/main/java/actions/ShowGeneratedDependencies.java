@@ -19,18 +19,12 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import managers.PropertiesManager;
-import org.apache.commons.io.FileUtils;
-import org.apache.http.util.TextUtils;
 import utils.PathHelper;
-import utils.PropertyKeys;
 import utils.Strings;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 public class ShowGeneratedDependencies extends AnAction {
 

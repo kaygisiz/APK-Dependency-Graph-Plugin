@@ -17,19 +17,15 @@ package actions;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.fileChooser.FileChooser;
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import managers.FileChooserDialogManager;
 import managers.PropertiesManager;
-import org.apache.http.util.TextUtils;
+import org.apache.commons.lang3.StringUtils;
 import utils.FileTypes;
 import utils.PropertyKeys;
 import utils.Strings;
-
-import java.util.Objects;
 
 public class SetApkPathAction extends AnAction {
     @Override
@@ -39,7 +35,7 @@ public class SetApkPathAction extends AnAction {
             String currentApkPath = PropertiesManager.getData(project, PropertyKeys.APK_PATH);
 
             VirtualFile fileToSelectOnCreate =
-                    TextUtils.isEmpty(currentApkPath)
+                    StringUtils.isEmpty(currentApkPath)
                             ? project.getBaseDir()
                             : LocalFileSystem.getInstance().findFileByPath(currentApkPath);
 

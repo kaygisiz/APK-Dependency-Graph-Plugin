@@ -15,7 +15,6 @@
  */
 package actions;
 
-import code.Main;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -27,16 +26,19 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import managers.FileChooserDialogManager;
 import managers.PropertiesManager;
-import org.apache.http.util.TextUtils;
-import org.jetbrains.annotations.NotNull;
-import utils.FileTypes;
-import utils.PathHelper;
-import utils.PropertyKeys;
-import utils.Strings;
+import org.apache.commons.lang3.StringUtils;
+import org.jf.dexlib2.DexFileFactory;
+import org.jf.dexlib2.Opcodes;
+import org.jf.dexlib2.dexbacked.DexBackedDexFile;
+import utils.*;
+import utils.Writer;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class GenerateDependencyInjectionGraph extends AnAction {
     private String apkPath;
@@ -52,26 +54,26 @@ public class GenerateDependencyInjectionGraph extends AnAction {
         Project project = anActionEvent.getProject();
 
         if (project != null) {
-
             try {
                 initFiles(project);
             } catch (IOException e) {
                 e.printStackTrace();
+                Messages.showInfoMessage(e.getMessage(), Strings.TITLE_ERROR_OPEN_BROWSER);
             }
 
-            if (TextUtils.isEmpty(apkPath)) {
+            if (StringUtils.isEmpty(apkPath)) {
                 chooseAndSaveApkFile(project);
             }
 
             packageName = PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME);
 
-            if (TextUtils.isEmpty(packageName)) {
+            if (StringUtils.isEmpty(packageName)) {
                 setPackageName(project);
             }
 
             isInnerClassEnabled = PropertiesManager.getData(project, PropertyKeys.IS_INNER_CLASS_ENABLE, Strings.TRUE);
 
-            if (!TextUtils.isEmpty(apkPath) && !TextUtils.isEmpty(packageName)) {
+            if (!StringUtils.isEmpty(apkPath) && !StringUtils.isEmpty(packageName)) {
                 Task task = generateDependencyInjectionGraph(project);
                 task.queue();
             }
@@ -79,35 +81,67 @@ public class GenerateDependencyInjectionGraph extends AnAction {
     }
 
     private void initFiles(Project project) throws IOException {
-
         pathHelper = new PathHelper(project);
-
         apkPath = PropertiesManager.getData(project, PropertyKeys.APK_PATH);
 
         File webDir = new File(pathHelper.getWebDir());
         if (!webDir.exists()) {
             FileUtil.copyDir(
                     new File(pathHelper.replaceCharWithSpace(getClass().getResource("/web").getPath())),
-                    webDir
-            );
+                    webDir);
         }
+    }
+
+    private List<String> filterByExtension(final String zipFilePath, final String extension) throws IOException {
+        List<String> files = new ArrayList<>();
+        ZipFile zipFile = new ZipFile(zipFilePath);
+        Enumeration<? extends ZipEntry> zipEntries = zipFile.entries();
+        while (zipEntries.hasMoreElements()) {
+            ZipEntry zipEntry = zipEntries.nextElement();
+            if (!zipEntry.isDirectory()) {
+                String fileName = zipEntry.getName();
+                if (fileName.endsWith(extension)) {
+                    files.add(fileName);
+                }
+            }
+        }
+        return files;
     }
 
     private Task.Backgroundable generateDependencyInjectionGraph(Project project) {
         return new Task.Backgroundable(project, Strings.BACKGROUNDABLE_PROGRESS_TITLE, true) {
             @Override
-            public void run(@NotNull ProgressIndicator progIndicator) {
-                Main.main(new String[]{"-i", pathHelper.getDecompiledDir(), "-o", pathHelper.getAnalyzedJsFile(), "-f", packageName, "-d", isInnerClassEnabled, "-a", apkPath});
+            public void run(ProgressIndicator progressIndicator) {
+                try {
+                    //TODO is it important enough to be selectable?
+                    int apiVersion = 28;
+                    for (String dexFileName : filterByExtension(apkPath, ".dex")) {
+                        DexBackedDexFile dexFile = DexFileFactory.loadDexEntry(new File(apkPath), dexFileName, true, Opcodes.forApi(apiVersion)).getDexFile();
+                        CustomBaksmali.disassembleDexFile(dexFile, new File(pathHelper.getDecompiledDir()), packageName);
+                    }
+                    SmaliAnalyzer smaliAnalyzer = new SmaliAnalyzer(project, Boolean.getBoolean(isInnerClassEnabled), packageName);
+                    if (smaliAnalyzer.run()) {
+                        File resultFile = new File(pathHelper.getAnalyzedJsFile());
+                        Writer.write(resultFile, smaliAnalyzer.getDependencies());
+                    } else {
+                        progressIndicator.setText(Strings.CANCELING_BY_ANALYZER);
+                        Messages.showInfoMessage(Strings.ERROR_CANCELED_ANALYZING, Strings.TITLE_ERROR_OPEN_BROWSER);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Messages.showInfoMessage(e.getMessage(), Strings.TITLE_DEFAULT_ERROR);
+                }
             }
 
             @Override
             public void onSuccess() {
                 super.onSuccess();
                 try {
-                    Desktop.getDesktop().browse(new File(pathHelper.getIndexHtmlFile()).toURI());
                     FileUtil.asyncDelete(new File(pathHelper.getDecompiledDir()));
+                    Desktop.getDesktop().browse(new File(pathHelper.getIndexHtmlFile()).toURI());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Messages.showInfoMessage(Strings.ERROR_OPEN_BROWSER, Strings.TITLE_ERROR_OPEN_BROWSER);
                 }
             }
         };
@@ -136,7 +170,7 @@ public class GenerateDependencyInjectionGraph extends AnAction {
                 PropertiesManager.getData(project, PropertyKeys.PACKAGE_NAME),
                 new NonEmptyInputValidator());
 
-        if (!TextUtils.isEmpty(packageName)) {
+        if (!StringUtils.isEmpty(packageName)) {
             this.packageName = packageName;
             PropertiesManager.putData(project, PropertyKeys.PACKAGE_NAME, packageName);
         }
